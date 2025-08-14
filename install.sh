@@ -43,16 +43,23 @@ find . -path ./.git -prune -o -type f \! -name install.sh -print | while read sr
 			install)
 				dst=${(e)cmd[3]}
 				instsrc=$src
-				if [[ $zshexpn = yes ]]; then
+				if [[ $zshexpn == yes ]]; then
 					contents=$(cat $src)
 					contents=${(e)contents}
-					printf "%s" $contents > $file
+					printf "%s\n" $contents > $file
 					instsrc=$file
 				fi
 
 				install -d -m 755 $(dirname $dst)
 				install -m ${cmd[2]} $instsrc $dst
-				echo "$src -> $dst"
+				if [[ $zshexpn == yes ]]; then
+					marker=">>"
+				else
+					marker="->"
+				fi
+				printf "%s %s %s\n" "$src" "$marker" "$dst"
+
+				# Store the last installed file so we can hardlink to it
 				last_installed=$dst
 				;;
 			hardlink)
@@ -62,8 +69,8 @@ find . -path ./.git -prune -o -type f \! -name install.sh -print | while read sr
 				fi
 				src=$last_installed
 				dst=${(e)cmd[2]}
-				ln $src $dst
-				echo "$src -> $dst (hard link)"
+				ln -f $src $dst
+				echo "$src => $dst"
 				;;
 			postexec)
 				# uncomment once i'm sure this does the right thing

@@ -1,0 +1,12 @@
+# @!user:josh
+# @!os:unix
+# @!zshexpn:yes
+# @!install:644:$HOME/.ssh/config
+Include $HOME/.colima/ssh_config
+Host roosh
+	HostName roosh.pcaops.com
+Host rodd.us
+	User jerodd
+	HostName direct.rodd.us
+Host theapprovedbookshelf.com
+	HostName themarketplatz.com

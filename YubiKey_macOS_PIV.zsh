@@ -25,6 +25,7 @@ Options:
 	--wipe:		Replaces the current pairing even if it already seems
 			exist and be valid.
 	--no-reset:	Don't remove existing credentials on a YubiKey.
+	--no-yk:	Don't run commands that require a YubiKey.
 	--no-piv:	Skip PIV login setup.
 	--no-gpg:	Skip GnuPG setup.
 
@@ -40,8 +41,10 @@ function load_defaults {
 	prompt_timeout=60
 	piv=--piv
 	gpg=--gpg
+	yk=--yk
 	reset=--reset
 	check_versions=--check-versions
+	verbose=1
 }
 
 script_name=YubiKey_macOS_piv.sh
@@ -63,7 +66,7 @@ function check_os {
 
 function process_options {
 	arg_options=(--mgmt-key --user-pin --spin-hz --prompt-timeout)
-	bool_options=(--dry-run --quiet --force --wipe --reset --check-versions --piv --gpg --verbose)
+	bool_options=(--dry-run --quiet --force --wipe --reset --check-versions --piv --gpg)
 	typeset -A aliases
 	aliases=(
 		"-n" "--dry-run"
@@ -84,6 +87,11 @@ function process_options {
 		elif [[ $opt == --help ]]; then
 			help
 			exit 0
+		elif [[ $opt == --verbose || --no-quiet ]]; then
+			if [[ -z $verbose ]]; then verbose=0; fi
+			verbose=$[$verbose + 1]
+		elif [[ $opt == --quiet ]]; then
+			verbose=""
 		elif [[ $opt == --no-* ]]; then
 			opt=${opt/--no-/--}
 			if [[ ${arg_options[(ie)$opt]} -le ${$#arg_options} ]]; then
@@ -140,7 +148,7 @@ function require_version {
 	required=$2
 	if [[ $# -le 2 || $3 == "" ]]; then packages=$component; else packages=$3; fi
 	if [[ $# -le 3 ]]; then descr="$component $required"; else descr="$component $4"; fi
-	if [[ -n $dry_run && -z $quiet ]]; then
+	if [[ -n $dry_run && -z $verbose ]]; then
 		printf "# Ensure %s is version %s+" $component $required
 		[[ -n $descr ]] && printf " (%s)" $descr
 		printf "\n"

@@ -91,7 +91,7 @@ function process_options {
 				opt=${opt//-/_}
 				unset $opt
 			else
-				printf "%s: invalid option '%q'\n" $ZSH_ARGZERO $opt
+				printf "%s: invalid option %q\n" $ZSH_ARGZERO $opt
 				exit 1
 			fi
 		elif [[ ${bool_options[(ie)$opt]} -le ${#bool_options} ]]; then
@@ -106,7 +106,7 @@ function process_options {
 				opt=${opt//-/_}
 				unset $opt
 			else
-				printf "%s: invalid option '%q'\n" $ZSH_ARGZERO $opt
+				printf "%s: invalid option %q\n" $ZSH_ARGZERO $opt
 				exit 1
 			fi
 		elif [[ $opt == *=* && ${arg_options[(ie)$opt_equals]} -le ${#arg_options} ]]; then
@@ -120,7 +120,7 @@ function process_options {
 			opt=${opt//-/_}
 			eval "$opt=$value"
 		else
-			printf "%s: invalid option '%q'\n" $ZSH_ARGZERO $opt
+			printf "%s: invalid option %q\n" $ZSH_ARGZERO $opt
 			exit 1
 		fi
 	done
@@ -213,11 +213,7 @@ function run_cmd {
 		idx=0
 		for arg in "$@"; do
 			idx=$[$idx + 1]
-			if [[ $arg == *[\'\"]* ]]; then
-				printf "'%q'" $arg
-			else
-				printf "%q" $arg
-			fi
+			printf "%q" $arg
 			if [[ $# -eq $idx ]]; then
 				printf "\n"
 			else
